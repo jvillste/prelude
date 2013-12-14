@@ -2,6 +2,7 @@
                             hideshow
                             iedit
                             paredit
+                            ;midje-mode
                             ;paredit-menu
                             ;auto-complete
                             ;ac-nrepl
@@ -41,7 +42,7 @@
 
 (require 'cider)
 (require 'hideshow)
-
+(require 'auto-complete)
 ;;enable arrow keys
 (setq prelude-guru nil)
 
@@ -56,17 +57,16 @@
                                              (switch-to-buffer "*cider-error*")))
 
 
-
-(add-hook 'cider-mode-hook 'enable-paredit-mode)
-(add-hook 'cider-mode-hook 'turn-off-smartparens-mode)
-(add-hook 'cider-mode-hook (lambda () (flyspell-mode -1)))
-
 (defun my-prog-mode-defaults ()
-  (turn-off-smartparens-mode))
+  (smartparens-mode -1))
 (add-hook 'prelude-prog-mode-hook 'my-prog-mode-defaults t)
 
 (defun my-clojure-mode-defaults ()
-  (clojure-test-mode -1))
+  (paredit-mode +1)
+  ;;(midje-mode +1)
+  (clojure-test-mode -1)
+  (flyspell-mode -1)
+  (smartparens-strict-mode -1))
 (add-hook 'prelude-clojure-mode-hook 'my-clojure-mode-defaults t)
 
 
@@ -74,30 +74,27 @@
 (defun cider-refresh ()
   (interactive)
   (save-buffer)
-  (cider-interactive-eval "(flow-gl.refresh/refresh)"))
+  (cider-interactive-eval "(require 'midje.repl)(require 'flow-gl.refresh)(flow-gl.refresh/refresh)"))
 (global-set-key [f5] 'cider-refresh)
 
 ;; cider load-facts
-(defun cider-refresh ()
+(defun cider-load-facts ()
   (interactive)
   (save-buffer)
-  (cider-interactive-eval "(flow-gl.refresh/load-facts)"))
-(global-set-key [f4] 'cider-refresh)
+  (cider-interactive-eval "(require 'midje.repl)(require 'flow-gl.refresh)(flow-gl.refresh/load-facts)"))
+(global-set-key [f4] 'cider-load-facts)
 
-;; cider load-facts
-(defun cider-refresh ()
+;; cider check-facts
+(defun cider-check-facts ()
   (interactive)
   (save-buffer)
-  (cider-interactive-eval "(midje.repl/check-facts)"))
-(global-set-key [f6] 'cider-refresh)
+  (cider-eval-defun-at-point)
+  (cider-interactive-eval "(require 'midje.repl)(midje.repl/check-facts)"))
+(global-set-key [f6] 'cider-check-facts)
 
 
 ;; cider restart
-(defun my-cider-restart ()
-  (interactive)
-  (cider-quit)
-  (cider-jack-in))
-(global-set-key [f9] 'my-cider-restart)
+(global-set-key [f9] 'cider-restart)
 
 ;; save and load buffer
 (defun load-cider-buffer ()
@@ -115,15 +112,15 @@
 ;; highlight-symbol-mode
 ;(add-hook 'cider-mode-hook 'highlight-symbol-mode)
 (set 'highlight-symbol-idle-delay 0.1)
-(define-key cider-mode-map [(control f3)] 'highlight-symbol-mode)
-(define-key cider-mode-map [f3] 'highlight-symbol-next)
-(define-key cider-mode-map [(shift f3)] 'highlight-symbol-prev)
+(define-key clojure-mode-map [(control f3)] 'highlight-symbol-mode)
+(define-key clojure-mode-map [f3] 'highlight-symbol-next)
+(define-key clojure-mode-map [(shift f3)] 'highlight-symbol-prev)
 
 
 ;; hideshow-mode
-(add-hook 'cider-mode-hook 'hs-minor-mode)
-(define-key cider-mode-map (kbd "C-c C-u") 'hs-hide-all)
-(define-key cider-mode-map (kbd "C-c C-o") 'hs-show-all)
+(add-hook 'clojure-mode-hook 'hs-minor-mode)
+(define-key clojure-mode-map (kbd "C-c C-u") 'hs-hide-all)
+(define-key clojure-mode-map (kbd "C-c C-o") 'hs-show-all)
 
 
 (set 'whitespace-line-column 200)
