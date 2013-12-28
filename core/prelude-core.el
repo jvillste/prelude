@@ -297,12 +297,9 @@ there's a region, all lines that region covers will be duplicated."
 (defun prelude-eval-and-replace ()
   "Replace the preceding sexp with its value."
   (interactive)
-  (backward-kill-sexp)
-  (condition-case nil
-      (prin1 (eval (read (current-kill 0)))
-             (current-buffer))
-    (error (message "Invalid expression")
-           (insert (current-kill 0)))))
+  (let ((value (eval (preceding-sexp))))
+    (backward-kill-sexp)
+    (insert (format "%s" value))))
 
 (defun prelude-recompile-init ()
   "Byte-compile all your dotfiles again."
@@ -563,6 +560,12 @@ This follows freedesktop standards, should work in X servers."
                            ((s-equals? "bash" shell) ".bashrc")
                            (t (error "Unknown shell")))))
     (find-file-other-window (expand-file-name shell-init-file (getenv "HOME")))))
+
+(defun prelude-wrap-with (s)
+  "Create a wrapper function for smartparens using S."
+  `(lambda (&optional arg)
+     (interactive "P")
+     (sp-wrap-with-pair ,s)))
 
 (provide 'prelude-core)
 ;;; prelude-core.el ends here
