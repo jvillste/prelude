@@ -2,38 +2,54 @@
                             hideshow
                             iedit
                             paredit
-                            ;midje-mode
-                            ;paredit-menu
-                            ;auto-complete
-                            ;ac-nrepl
+                                        ;cider
+                                        ;midje-mode
+                                        ;paredit-menu
+                                        ;auto-complete
+                                        ;ac-nrepl
                             ))
 
 ;; ac-nrepl
 
-;(require 'ac-nrepl)
+                                        ;(require 'ac-nrepl)
 ;; (add-hook 'cider-repl-mode-hook 'ac-nrepl-setup)
 ;; (add-hook 'cider-mode-hook 'ac-nrepl-setup)
 ;; (eval-after-load "auto-complete"
 ;;   '(add-to-list 'ac-modes 'cider-repl-mode))
 
-;(defun set-auto-complete-as-completion-at-point-function ()
-;  (setq completion-at-point-functions '(auto-complete)))
-;(add-hook 'auto-complete-mode-hook 'set-auto-complete-as-completion-at-point-function)
+                                        ;(defun set-auto-complete-as-completion-at-point-function ()
+                                        ;  (setq completion-at-point-functions '(auto-complete)))
+                                        ;(add-hook 'auto-complete-mode-hook 'set-auto-complete-as-completion-at-point-function)
 
-;(add-hook 'cider-repl-mode-hook 'set-auto-complete-as-completion-at-point-function)
-
-
+                                        ;(add-hook 'cider-repl-mode-hook 'set-auto-complete-as-completion-at-point-function)
 
 
-;(eval-after-load "cider"
-;  '(define-key cider-mode-map (kbd "C-c C-d") 'ac-nrepl-popup-doc))
+
+
+                                        ;(eval-after-load "cider"
+                                        ;  '(define-key cider-mode-map (kbd "C-c C-d") 'ac-nrepl-popup-doc))
 
 
 
 ;;; ---------  (add-hook 'cider-mode-hook (lambda () (add-to-list completion-at-point-functions ')))
 
+;; always split horizontaly
+
+(setq split-height-threshold 0)
+(setq split-width-threshold nil)
+
+;; MAC
+
+;;; Set command as meta
+(setq mac-option-key-is-meta nil
+      mac-command-key-is-meta t
+      mac-command-modifier 'meta
+      mac-option-modifier 'none)
+
+;; FONT
 
 (set-face-font 'default "-*-fixed-regular-r-*-*-13-*-*-*-*-*-*")
+
 
 (defun open-personal ()
   (interactive)
@@ -42,12 +58,16 @@
 
 (require 'cider)
 (require 'hideshow)
-(require 'auto-complete)
+                                        ;(require 'auto-complete)
 ;;enable arrow keys
 (setq prelude-guru nil)
 
 ;; disable current line highlighting
 (global-hl-line-mode -1)
+
+;; disable whitespace mode
+(setq prelude-whitespace nil)
+
 
 (define-key cider-mode-map (kbd "TAB") 'cider-repl-indent-and-complete-symbol)
 (define-key cider-mode-map (kbd "C-c j") 'ace-jump-mode)
@@ -58,7 +78,8 @@
 
 
 (defun my-prog-mode-defaults ()
-  (smartparens-mode -1))
+  (smartparens-mode -1)
+  )
 (add-hook 'prelude-prog-mode-hook 'my-prog-mode-defaults t)
 
 (defun my-clojure-mode-defaults ()
@@ -110,9 +131,9 @@
 (define-key cider-mode-map (kbd "C-c m") 'git-diftool-current-buffer)
 
 ;; highlight-symbol-mode
-;(add-hook 'cider-mode-hook 'highlight-symbol-mode)
+                                        ;(add-hook 'cider-mode-hook 'highlight-symbol-mode)
 (set 'highlight-symbol-idle-delay 0.1)
-(define-key clojure-mode-map [(control f3)] 'highlight-symbol-mode)
+(define-key clojure-mode-map [(meta f3)] 'highlight-symbol-mode)
 (define-key clojure-mode-map [f3] 'highlight-symbol-next)
 (define-key clojure-mode-map [(shift f3)] 'highlight-symbol-prev)
 
