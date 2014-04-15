@@ -5,33 +5,27 @@
                                         ;cider
                                         ;midje-mode
                                         ;paredit-menu
-                                        ;auto-complete
-                                        ;ac-nrepl
-                            ))
+                            auto-complete
+                            ac-nrepl
+                            fuzzy))
 
 ;; ac-nrepl
 
-                                        ;(require 'ac-nrepl)
-;; (add-hook 'cider-repl-mode-hook 'ac-nrepl-setup)
-;; (add-hook 'cider-mode-hook 'ac-nrepl-setup)
-;; (eval-after-load "auto-complete"
-;;   '(add-to-list 'ac-modes 'cider-repl-mode))
+(require 'ac-nrepl)
+(add-hook 'cider-repl-mode-hook 'ac-nrepl-setup)
+(add-hook 'cider-mode-hook 'ac-nrepl-setup)
+(eval-after-load "auto-complete"
+  '(add-to-list 'ac-modes 'cider-repl-mode))
 
-                                        ;(defun set-auto-complete-as-completion-at-point-function ()
-                                        ;  (setq completion-at-point-functions '(auto-complete)))
-                                        ;(add-hook 'auto-complete-mode-hook 'set-auto-complete-as-completion-at-point-function)
+(defun set-auto-complete-as-completion-at-point-function ()
+  (setq completion-at-point-functions '(auto-complete)))
+(add-hook 'auto-complete-mode-hook 'set-auto-complete-as-completion-at-point-function)
 
-                                        ;(add-hook 'cider-repl-mode-hook 'set-auto-complete-as-completion-at-point-function)
+(add-hook 'cider-repl-mode-hook 'set-auto-complete-as-completion-at-point-function)
+(add-hook 'cider-mode-hook 'set-auto-complete-as-completion-at-point-function)
 
+(add-hook 'cider-repl-mode-hook 'auto-complete-mode)
 
-
-
-                                        ;(eval-after-load "cider"
-                                        ;  '(define-key cider-mode-map (kbd "C-c C-d") 'ac-nrepl-popup-doc))
-
-
-
-;;; ---------  (add-hook 'cider-mode-hook (lambda () (add-to-list completion-at-point-functions ')))
 
 ;; always split horizontaly
 
@@ -75,15 +69,33 @@
 (define-key cider-mode-map (kbd "C-c C-ö") (lambda ()
                                              (interactive)
                                              (switch-to-buffer "*cider-error*")))
+(define-key cider-mode-map (kbd "C-c C-ä") (lambda ()
+                                             (interactive)
+                                             (switch-to-buffer "*nrepl-server flow-gl*")))
+
+(define-key cider-mode-map (kbd "M-n") 'cider-jump-to-compilation-error)
+
+
+;; Magit
+
+(set-variable 'magit-emacsclient-executable "/usr/local/Cellar/emacs/24.3/bin/emacsclient")
+
+(defun magit-commit-and-push-all ()
+  (interactive)
+  (message "committing and pushing")
+  (magit-run-git "commit" "-am" "X")
+  (magit-run-git "push")
+  (message "ready"))
+(global-set-key (kbd "C-c .") 'magit-commit-and-push-all)
 
 
 (defun my-prog-mode-defaults ()
-  (smartparens-mode -1)
-  )
+  (smartparens-mode -1))
 (add-hook 'prelude-prog-mode-hook 'my-prog-mode-defaults t)
 
 (defun my-clojure-mode-defaults ()
   (paredit-mode +1)
+  (auto-complete-mode +1)
   ;;(midje-mode +1)
   (clojure-test-mode -1)
   (flyspell-mode -1)
@@ -112,6 +124,14 @@
   (cider-eval-defun-at-point)
   (cider-interactive-eval "(require 'midje.repl)(midje.repl/check-facts)"))
 (global-set-key [f6] 'cider-check-facts)
+
+
+;; cider check-facts
+(defun cider-start ()
+  (interactive)
+  (cider-repl-set-ns (cider-current-ns))
+  (cider-interactive-eval "(start)"))
+(global-set-key [f7] 'cider-start)
 
 
 ;; cider restart
@@ -145,3 +165,15 @@
 
 
 (set 'whitespace-line-column 200)
+
+
+;; tree text
+
+(setq tree-text-keywords
+      '(("\(:li.*?\n.*?\)" . font-lock-function-name-face)
+        ("\(\:[:alpha:].*" . font-lock-function-name-face)
+        ("\(:ch" . font-lock-function-name-face)))
+
+(define-derived-mode tree-text-mode fundamental-mode
+  (setq font-lock-defaults '(tree-text-keywords))
+  (setq mode-name "ttxt"))
