@@ -2,29 +2,41 @@
                             hideshow
                             iedit
                             paredit
-                                        ;cider
+                            cider
+                            ac-cider
                                         ;midje-mode
                                         ;paredit-menu
                             auto-complete
-                            ac-nrepl
+                                        ;ac-nrepl
                             fuzzy))
+
+(require 'cider)
+(require 'hideshow)
 
 ;; ac-nrepl
 
-(require 'ac-nrepl)
-(add-hook 'cider-repl-mode-hook 'ac-nrepl-setup)
-(add-hook 'cider-mode-hook 'ac-nrepl-setup)
+(require 'ac-cider)
+(add-hook 'cider-mode-hook 'ac-flyspell-workaround)
+(add-hook 'cider-mode-hook 'ac-cider-setup)
+(add-hook 'cider-repl-mode-hook 'ac-cider-setup)
 (eval-after-load "auto-complete"
-  '(add-to-list 'ac-modes 'cider-repl-mode))
+  '(add-to-list 'ac-modes 'cider-mode))
 
-(defun set-auto-complete-as-completion-at-point-function ()
-  (setq completion-at-point-functions '(auto-complete)))
-(add-hook 'auto-complete-mode-hook 'set-auto-complete-as-completion-at-point-function)
+;; (require 'ac-nrepl)
+;; (add-hook 'cider-repl-mode-hook 'ac-nrepl-setup)
+;; (add-hook 'cider-mode-hook 'ac-nrepl-setup)
+;; (eval-after-load "auto-complete"
+;;   '(add-to-list 'ac-modes 'cider-repl-mode))
 
-(add-hook 'cider-repl-mode-hook 'set-auto-complete-as-completion-at-point-function)
-(add-hook 'cider-mode-hook 'set-auto-complete-as-completion-at-point-function)
 
-(add-hook 'cider-repl-mode-hook 'auto-complete-mode)
+;; (defun set-auto-complete-as-completion-at-point-function ()
+;;   (setq completion-at-point-functions '(auto-complete)))
+;; (add-hook 'auto-complete-mode-hook 'set-auto-complete-as-completion-at-point-function)
+
+;; (add-hook 'cider-repl-mode-hook 'set-auto-complete-as-completion-at-point-function)
+;; (add-hook 'cider-mode-hook 'set-auto-complete-as-completion-at-point-function)
+
+;; (add-hook 'cider-repl-mode-hook 'auto-complete-mode)
 
 
 ;; always split horizontaly
@@ -50,8 +62,6 @@
   (find-file "~/.emacs.d/personal/personal.el"))
 (global-set-key [f7] 'open-personal)
 
-(require 'cider)
-(require 'hideshow)
                                         ;(require 'auto-complete)
 ;;enable arrow keys
 (setq prelude-guru nil)
@@ -126,7 +136,7 @@
 (global-set-key [f6] 'cider-check-facts)
 
 
-;; cider check-facts
+;; cider start
 (defun cider-start ()
   (interactive)
   (cider-repl-set-ns (cider-current-ns))
@@ -177,3 +187,27 @@
 (define-derived-mode tree-text-mode fundamental-mode
   (setq font-lock-defaults '(tree-text-keywords))
   (setq mode-name "ttxt"))
+
+
+;; generate tree text
+(defun generate-tree-text ()
+  (interactive)
+  (save-buffer)
+  (cider-interactive-eval "(tree-text.meeting/generate)"))
+(global-set-key (kbd "C-c C-a") 'generate-tree-text)
+
+;; date time
+
+(defun insert-current-date-time ()
+  (interactive)
+  (when (use-region-p)
+    (delete-region (region-beginning) (region-end)))
+  (insert (format-time-string "%e %m %Y %H %M" (current-time))))
+(define-key cider-mode-map (kbd "C-c C-d") 'insert-current-date-time)
+
+(defun insert-debug ()
+  (interactive)
+  (when (use-region-p)
+    (delete-region (region-beginning) (region-end)))
+  (insert "(flow-gl.debug/ppreturn )"))
+(define-key cider-mode-map (kbd "C-c C-d") 'insert-debug)
