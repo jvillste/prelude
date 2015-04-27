@@ -1,4 +1,5 @@
 (prelude-require-packages '(highlight-symbol
+                            clj-refactor
                             hideshow
                             iedit
                             paredit
@@ -10,8 +11,22 @@
                                         ;ac-nrepl
                             fuzzy))
 
+
+
+(require 'clj-refactor)
+(add-hook 'clojure-mode-hook (lambda ()
+                               (clj-refactor-mode 1)
+                               (cljr-add-keybindings-with-prefix "C-c C-m")))
+
 (require 'cider)
 (require 'hideshow)
+
+;; recent files
+
+(require 'recentf)
+(recentf-mode 1)
+(setq recentf-max-menu-items 25)
+(global-set-key "\C-x\ \C-r" 'recentf-open-files)
 
 ;; ac-nrepl
 
@@ -54,7 +69,7 @@
 
 ;; FONT
 
-(set-face-font 'default "-*-fixed-regular-r-*-*-13-*-*-*-*-*-*")
+(set-face-font 'default "-*-fixed-regular-r-*-*-12-*-*-*-*-*-*")
 
 
 (defun open-personal ()
@@ -158,7 +173,7 @@
 (defun git-diftool-current-buffer ()
   (interactive)
   (start-process  "git-difftool" "git-difftool" "git" "difftool" "-y" (buffer-file-name)))
-(define-key cider-mode-map (kbd "C-c m") 'git-diftool-current-buffer)
+;;(define-key cider-mode-map (kbd "C-c m") 'git-diftool-current-buffer)
 
 ;; highlight-symbol-mode
                                         ;(add-hook 'cider-mode-hook 'highlight-symbol-mode)
@@ -170,7 +185,7 @@
 
 ;; hideshow-mode
 (add-hook 'clojure-mode-hook 'hs-minor-mode)
-(define-key clojure-mode-map (kbd "C-c C-u") 'hs-hide-all)
+(define-key clojure-mode-map (kbd "C-c C-j") 'hs-hide-all)
 (define-key clojure-mode-map (kbd "C-c C-o") 'hs-show-all)
 
 
@@ -182,11 +197,14 @@
 (setq tree-text-keywords
       '(("\(:li.*?\n.*?\)" . font-lock-function-name-face)
         ("\(\:[:alpha:].*" . font-lock-function-name-face)
+        ("\(\!.*" . font-lock-function-name-face)
         ("\(:ch" . font-lock-function-name-face)))
 
-(define-derived-mode tree-text-mode fundamental-mode
+(define-derived-mode tree-text-mode clojure-mode ;;fundamental-mode
   (setq font-lock-defaults '(tree-text-keywords))
   (setq mode-name "ttxt"))
+
+(add-to-list 'auto-mode-alist '("\\.ttxt\\'" . tree-text-mode))
 
 
 ;; generate tree text
@@ -210,4 +228,4 @@
   (when (use-region-p)
     (delete-region (region-beginning) (region-end)))
   (insert "(flow-gl.debug/ppreturn )"))
-(define-key cider-mode-map (kbd "C-c C-d") 'insert-debug)
+;;(define-key cider-mode-map (kbd "C-c C-d") 'insert-debug)
